@@ -25,7 +25,7 @@ class Animal {
     this.name = 'abc' // 因为在构造函数中是初始化阶段 readonly的值是可以修改的
   }
   changeName(name: string) {
-    this.name = name // 这里如果是readonly属性则不能再修改了
+    // this.name = name // 这里如果是readonly属性则不能再修改了
   }
 }
 class Cat extends Animal {
