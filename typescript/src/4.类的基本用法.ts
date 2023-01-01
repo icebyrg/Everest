@@ -18,7 +18,8 @@ let circle = new Circle(100, 100)
 class Animal {
   // public name!: string
   // public age!: number
-  constructor(public readonly name: string, public age: number) { // 直接在参数中添加 public private protected 这些属性会默认添加到实例
+  constructor(public readonly name: string, public age: number) {
+    // 直接在参数中添加 public private protected 这些属性会默认添加到实例
     // this.name = name
     // this.age = age
     this.name = 'abc' // 因为在构造函数中是初始化阶段 readonly的值是可以修改的
@@ -42,7 +43,8 @@ class Animal1 {
   static type = '哺乳类'
   // 类中如何声明原型属性？
   private _name: string = 'Tom'
-  get name() { // 类的访问器 访问的是原型上的属性
+  get name() {
+    // 类的访问器 访问的是原型上的属性
     return this._name
   }
   set name(newValue) {
@@ -57,32 +59,33 @@ console.log(Animal1.type)
 // 子类中重写父类的方法 要求必须和父类的方法类型一致
 class Animal2 {
   static getType() {
-    console.log('父');
+    console.log('父')
     return '哺乳类'
   }
   public eat: () => void // 实例方法
   constructor() {
-    this.eat = () => { }
+    this.eat = () => {}
   }
   say(): void {
-    console.log('父say');
+    console.log('父say')
   } // 不关心返回值 则子类可以随便实现 是原型方法
 }
 class Mouse extends Animal2 {
   static getType() {
     // 调用父类
-    console.log('子');
+    console.log('子')
     super.getType()
     return '哺乳类'
   }
-  say(): string { // 兼容父类 组合优先于继承
+  say(): string {
+    // 兼容父类 组合优先于继承
     // 原型方法
-    console.log('子的say');
+    console.log('子的say')
     super.say()
     return 'abc'
   }
 }
-console.log(Animal2.getType());
+console.log(Animal2.getType())
 let mouse = new Mouse()
 mouse.say()
 // super 父类或者父类的原型
@@ -95,4 +98,51 @@ mouse.say()
 
 // 实例属性要提前声明 修饰符 private protected public readonly
 
-export { }
+// class Animal3 {
+//   protected constructor() {
+
+//   }
+// }
+// class Monkey extends Animal3 {
+
+// }
+// // 将父类改为不能new的状态
+// new Animal3()
+
+// 构造函数中增加了 private 或 protected 意味着不能再被new了
+
+class Singleton {
+  static instance = new Singleton()
+  private constructor() {}
+  static getInstance() {
+    return this.instance
+  }
+}
+// 单例模式
+let instance1 = Singleton.getInstance()
+let instance2 = Singleton.getInstance()
+console.log(instance1 === instance2)
+
+// 不能被new的 可以采用抽象类 抽象类中可以采用抽象方法
+abstract class Person {
+  // 抽象类中可以有非抽象的方法
+  drink() {
+    console.log('drink')
+  }
+  // abstract eat: () => void // 实例上的
+  abstract eat(): void // 需要子类来实现一个eat方法 原型上的
+}
+class Teacher extends Person {
+  eat: () => void // 实例上的
+  constructor() {
+    super()
+    this.eat = function () {}
+  }
+  // eat(): void {
+  //   console.log('eat') // 原型上的
+  // }
+}
+new Teacher()
+
+// 装饰器
+export {}
