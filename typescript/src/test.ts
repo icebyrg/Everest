@@ -1,19 +1,11 @@
-class Parent {
-  house() {}
+function fn1(callback: (a: string | number) => boolean | string) {
+  // callback
 }
 
-class Child extends Parent {
-  car() {}
-}
-
-class Grandson extends Child {
-  sleep() {}
-}
-
-function fn(callback: (instance: Child) => Child) {
-  callback(new Grandson())
-}
-// 参数允许逆变 返回值允许协变
-fn((instance: Parent): Grandson => {
-  return new Grandson()
+fn1((a: string | number | boolean) => {
+  return 'abc'
 })
+
+type Arg<T> = (arg: T) => void
+
+type xx = Arg<boolean | string | number> extends Arg<string | number> ? true : false
