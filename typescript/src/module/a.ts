@@ -1,5 +1,7 @@
 export namespace Zoo {
-  export class Dog {}
+  export class Dog {
+    a = 1
+  }
 }
 
 export namespace Zoo {
