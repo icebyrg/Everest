@@ -22,6 +22,14 @@
       effect(() => {
         // 使用类似react-hook
         app.innerHTML = state.name + state.age
+        // 嵌套的effect用设置parent属性保存和还原activeEffect来调节 类似于链表 一种树结构
+        // effect(() => {
+        //   app.innerHTML = state.name
+        // })
+        // effect(() => {
+        //   app.innerHTML = state.name
+        // })
+        // app.innerHTML = state.address
       })
       // setTimeout(() => {
       //   state.name = 'jaing'
