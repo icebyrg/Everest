@@ -1,5 +1,15 @@
 export let activeEffect = undefined
 
+function cleanupEffect(effect) {
+  // 在收集的列表中将自己移除掉
+  const { deps } = effect
+  for (let i = 0; i < deps.length; i++) {
+    // 找到set 让set中移除自己
+    deps[i].delete(effect)
+  }
+  effect.deps.length = 0 // 清空依赖的列表
+}
+
 export class ReactiveEffect {
   // 默认会将fn挂载到类的实例上
   constructor(private fn) {}
@@ -9,7 +19,9 @@ export class ReactiveEffect {
     try {
       this.parent = activeEffect
       activeEffect = this
-      return this.fn()
+      cleanupEffect(this) // 清理了上一次的依赖收集
+      // 返回值用于实现计算属性
+      return this.fn() // fn()会触发依赖收集
     } finally {
       activeEffect = this.parent
       this.parent = undefined
@@ -46,6 +58,9 @@ export function track(target, key) {
     let shouldTrack = !dep.has(activeEffect)
     if (shouldTrack) {
       dep.add(activeEffect)
+      // name = new Set(effect)
+      // age = new Set(effect)
+      // 我可以通过当前的effect找到这两个集合中的自己 将其移除掉就可以了
       activeEffect.deps.push(dep)
     }
   }
@@ -58,8 +73,10 @@ export function trigger(target, key, newValue, oldValue) {
     return
   }
   const dep = depsMap.get(key) // name 或者 age 对应的所有effect
-  dep &&
-    dep.forEach((effect) => {
+  const effects = [...dep] // 拷贝一份 运行和删除的不是同一个
+  // 运行的是数组 删除的是set
+  effects &&
+    effects.forEach((effect) => {
       // 正在执行的effect 不要多次执行
       if (effect !== activeEffect) effect.run()
     })
