@@ -43,7 +43,7 @@ export function track(target, key) {
       depsMap.set(key, (dep = new Set()))
     }
     // 如果有则看一下set中有没有这个effect
-    let shouldTrack = dep.has(activeEffect)
+    let shouldTrack = !dep.has(activeEffect)
     if (shouldTrack) {
       dep.add(activeEffect)
       activeEffect.deps.push(dep)
@@ -61,6 +61,6 @@ export function trigger(target, key, newValue, oldValue) {
   dep &&
     dep.forEach((effect) => {
       // 正在执行的effect 不要多次执行
-      if (effect !== activeEffect) effect.run
+      if (effect !== activeEffect) effect.run()
     })
 }

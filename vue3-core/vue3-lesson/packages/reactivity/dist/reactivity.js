@@ -39,7 +39,7 @@ function track(target, key) {
     if (!dep) {
       depsMap.set(key, dep = /* @__PURE__ */ new Set());
     }
-    let shouldTrack = dep.has(activeEffect);
+    let shouldTrack = !dep.has(activeEffect);
     if (shouldTrack) {
       dep.add(activeEffect);
       activeEffect.deps.push(dep);
@@ -54,7 +54,7 @@ function trigger(target, key, newValue, oldValue) {
   const dep = depsMap.get(key);
   dep && dep.forEach((effect2) => {
     if (effect2 !== activeEffect)
-      effect2.run;
+      effect2.run();
   });
 }
 
