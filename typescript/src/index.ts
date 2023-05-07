@@ -25,7 +25,7 @@ $.fn.extend({})
 import mitt from 'mitt'
 import type { Listener } from 'mitt'
 
-let fn = (...args) => {
+let fn = (...args: any[]) => {
   console.log(args)
 }
 
