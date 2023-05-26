@@ -6,7 +6,7 @@ let element = (
     <span>hello</span>
   </div>
 )
-console.log(element)
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
 root.render(element)
