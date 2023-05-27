@@ -8,5 +8,5 @@ let element = (
 )
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
-
+console.log(1)
 root.render(element)
