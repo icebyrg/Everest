@@ -1,12 +1,14 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from './react'
+import ReactDOM from './react-dom/client'
 
-let element = (
-  <div className="title" style={{ color: 'red' }}>
-    <span>hello</span>
-  </div>
-)
-console.log(element)
+function FunctionComponent(props) {
+  return (
+    <div className="title" style={{ color: 'red' }}>
+      {props.name}
+    </div>
+  )
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
-
+let element = <FunctionComponent name="hello" />
 root.render(element)
