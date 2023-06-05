@@ -8,6 +8,7 @@ export interface ILesson {
   poster: string
   price: number
   category?: string
+  id?: number
 }
 
 export interface ILessons {
