@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { reactive, watch, watchEffect, ref, toRef, toRefs } from './reactivity.js'
+      const state1 = reactive({ name: 'zzz' })
+      const state2 = reactive({ age: 30 })
+      const r = { ...toRefs(state1), ...toRefs(state2) }
+      // const r = { name: toRef(state1, 'name'), age: toRef(state2, 'age') }
+      watchEffect(() => {
+        app.innerHTML = r.name.value + r.age.value
+      })
+      setTimeout(() => {
+        r.name.value = 'xxx'
+      }, 1000)
+    </script>
+  </body>
+</html>
