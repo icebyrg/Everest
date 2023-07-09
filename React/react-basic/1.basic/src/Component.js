@@ -1,43 +1,72 @@
+import { findDOM, compareTwoVdom } from './react-dom/client'
+// an update queue
+export let updateQueue = {
+  isBatchingUpdate: false, // flag for whether updated, default in no batch and sync
+  updaters: new Set(), // update set
+  batchUpdate() {
+    updateQueue.isBatchingUpdate = false
+    for (const updater of updateQueue.updaters) {
+      updater.updateComponent()
+    }
+    updateQueue.updaters.clear()
+  },
+}
 class Updater {
-  // 每个更新器会保存一个类的实例
+  // each updater will save an instance of component class
   constructor(classInstance) {
     this.classInstance = classInstance
-    // 用来存放更新的状态
-    this.pendingStates = []
+    // save state of update
+    this.pendingState = []
+    this.callbacks = []
   }
-  addState(partialState) {
-    this.pendingStates.push(partialState)
-    // 准备更新
-    this.emitUpdate()
+  flushCallbacks() {
+    if (this.callbacks.length > 0) {
+      this.callbacks.forEach((callback) => callback())
+      this.callbacks.length = 0
+    }
+  }
+  addState(partialState, callback) {
+    this.pendingState.push(partialState)
+    if (typeof callback === 'function')
+      // ready to update
+      this.emitUpdate()
   }
   emitUpdate() {
+    // if need batch update
+    if (updateQueue.isBatchingUpdate) {
+      // no direct update component, save updater to queue
+      updateQueue.updaters.add(this)
+    } else {
+      this.updateComponent()
+    }
     this.updateComponent()
   }
   updateComponent() {
-    // 获取等待生效的状态数组和类的实例
-    const { pendingStates, classInstance } = this
-    // 如果有等待更新的状态数组
-    if (pendingStates.length > 0) {
+    // get pending state array and class instance
+    const { pendingState, classInstance } = this
+    // if has state waiting for update
+    if (pendingState.length > 0) {
       shouldUpdate(classInstance, this.getState())
     }
   }
-  // 根据等待生效的状态数组和当前的状态，计算出最新的状态
+  // calculate new state based on pending state array
   getState() {
-    const { pendingStates, classInstance } = this
-    // 先获取类的实例上的老状态
+    const { pendingState, classInstance } = this
     let { state } = classInstance
-    pendingStates.forEach((nextState) => {
-      state = { ...state, ...nextState }
+    pendingState.forEach((partialState) => {
+      if (typeof partialState === 'function') {
+        partialState = partialState()
+      }
+      state = { ...state, ...partialState }
     })
-    pendingStates.length = 0
-    return state
+    pendingState.length = 0
   }
 }
 
 function shouldUpdate(classInstance, nextState) {
-  // 先把计算得到的最新的状态赋值给类的实例
+  // assign calculated new value to class instance
   classInstance.state = nextState
-  // 让组件强制更新
+  // force component to update
   classInstance.forceUpdate()
 }
 
@@ -46,14 +75,25 @@ export class Component {
   constructor(props) {
     this.props = props
     this.state = {}
-    // 每个类会有一个更新器的实例
+    // each class has an updater
     this.updater = new Updater(this)
   }
-  setState(partialState) {
-    this.updater.addState(partialState)
+  setState(partialState, callback) {
+    this.updater.addState(partialState, callback)
   }
   forceUpdate() {
-    // forceUpdate
-    console.log('forceUpdate', this.state)
+    // get old dom then calc new virtual dom, diff them then update to real dom
+    // get old virtual dom first: div#counter
+    let oldRenderVdom = this.oldRenderVdom
+    // cal new virtual dom based on new state
+    let newRenderVdom = this.render()
+    // get old real dom(div)
+    const oldDOM = findDOM(oldRenderVdom)
+    // dom diff
+    compareTwoVdom(oldDOM.parentNode, oldRenderVdom, newRenderVdom)
+    // update oldRenderVdom to newly newRenderVom after updated
+    // always pointed to the current child node of current parent node
+    this.oldRenderVdom = newRenderVdom
+    this.updater.flushCallbacks()
   }
 }

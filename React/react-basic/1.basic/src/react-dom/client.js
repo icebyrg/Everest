@@ -1,5 +1,5 @@
 import { REACT_TEXT } from '../constant'
-
+import { addEvent } from '../event'
 /**
  * 把虚拟DOM变成真实DOM并插入到container容器里
  * @param {*} vdom
@@ -33,12 +33,24 @@ function createDOM(vdom) {
       }
     }
   }
+  // link between real and virtual dom after created
+  vdom.realDOM = dom
   return dom
+}
+
+function mountClassComponent(vdom) {
+  const { type: ClassComponent, props } = vdom
+  const classInstance = new ClassComponent(props)
+  const renderVdom = classInstance.render()
+  // put render result into classInstance.oldRenderVdom temporary
+  classInstance.oldRenderVom = renderVdom
+  return createDOM(renderVdom)
 }
 
 function mountFunctionComponent(vdom) {
   const { type, props } = vdom
   const renderVdom = type(props)
+  vdom.oldRenderVom = renderVdom
   return createDOM(renderVdom)
 }
 
@@ -66,7 +78,8 @@ function updateProps(dom, oldProps = {}, newProps = {}) {
         dom.style[attr] = styleObject[attr]
       }
     } else if (/^on[A-Z].*/.test(key)) {
-      dom[key.toLowerCase()] = newProps[key]
+      // dom[key.toLowerCase()] = newProps[key]
+      addEvent(dom, key, newProps[key])
     } else {
       // 如果是其他属性 则直接赋值
       dom[key] = newProps[key]
@@ -77,6 +90,17 @@ function updateProps(dom, oldProps = {}, newProps = {}) {
       dom[key] = null
     }
   }
+}
+
+export function findDOM(vdom) {
+  if (!vdom) return null
+  return vdom.realDOM
+}
+
+export function compareTwoVdom(parentDOM, oldVdom, newVdom) {
+  let oldDOM = findDOM(oldVdom)
+  let newDOM = createDOM(newVdom)
+  parentDOM.replaceChild(newDOM, oldDOM)
 }
 
 class DOMRoot {
