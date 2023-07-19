@@ -1,0 +1,3 @@
+// watch api用法很多 常见写法就是监控一个函数的返回值 根据返回值的变化触发对应的函数
+// watch可以传递一个响应式对象 可以监控到对象的变化触发回调
+// watch = effect + 包装 | watchEffect = effect...
