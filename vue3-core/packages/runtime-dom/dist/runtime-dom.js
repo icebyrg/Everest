@@ -255,10 +255,35 @@ function createRenderer(options) {
     let s1 = i;
     let s2 = i;
     const keyToNewIndexMap = /* @__PURE__ */ new Map();
-    for (let s22 = 0; s22 <= e2; s22++) {
-      const child = c2[s22];
-      keyToNewIndexMap.set(child.key, s22);
+    for (let i2 = s2; i2 <= e2; i2++) {
+      const child = c2[i2];
+      keyToNewIndexMap.set(child.key, i2);
     }
+    const toBePatch = e2 - s2 + 1;
+    const newIndexToOldIndexMap = new Array(toBePatch).fill(0);
+    for (let i2 = s1; i2 <= e1; i2++) {
+      const child = c1[i2];
+      let newIndex = keyToNewIndexMap.get(child.key);
+      if (newIndex == void 0) {
+        unmount(child);
+      } else {
+        newIndexToOldIndexMap[newIndex - s2] = i2 + 1;
+        patch(child, c2[newIndex], el);
+      }
+    }
+    console.log(newIndexToOldIndexMap);
+    for (let i2 = toBePatch - 1; i2 >= 0; i2--) {
+      const anchorIndex = s2 + i2;
+      const child = c2[anchorIndex];
+      const insertAnchor = c2[anchorIndex + 1]?.el;
+      if (newIndexToOldIndexMap[i2] === 0) {
+        patch(null, child, el, insertAnchor);
+      } else {
+        hostInsert(child.el, el, insertAnchor);
+      }
+      console.log(child);
+    }
+    console.log(keyToNewIndexMap);
   };
   const patchElement = (n1, n2, container) => {
     let el = n2.el = n1.el;

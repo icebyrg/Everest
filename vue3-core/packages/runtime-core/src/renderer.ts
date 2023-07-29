@@ -164,12 +164,52 @@ export function createRenderer(options) {
 
     let s1 = i
     let s2 = i
-
+    // take new element into map, find it in old one
     const keyToNewIndexMap = new Map()
-    for (let s2 = 0; s2 <= e2; s2++) {
-      const child = c2[s2]
-      keyToNewIndexMap.set(child.key, s2)
+    for (let i = s2; i <= e2; i++) {
+      const child = c2[i]
+      keyToNewIndexMap.set(child.key, i) // no key is undefined
     }
+    // searching in old for whether new has it, no means old is deleted
+    const toBePatch = e2 - s2 + 1
+    const newIndexToOldIndexMap = new Array(toBePatch).fill(0)
+    for (let i = s1; i <= e1; i++) {
+      const child = c1[i]
+      let newIndex = keyToNewIndexMap.get(child.key)
+      if (newIndex == undefined) {
+        unmount(child)
+      } else {
+        // a b c d
+        // b a e f
+        newIndexToOldIndexMap[newIndex - s2] = i + 1 // default is 0
+        // new and old both have, need diff them for attributes and sons
+        patch(child, c2[newIndex], el) // only compared for attributes, also need to move position
+      }
+    }
+    console.log(newIndexToOldIndexMap) // which elements doesn`t need moving
+    // [5,3,4,0]->[1,2] find out fixed elements based on marker, match index in reversed iteration and skip it
+    // [5,3,8,0,4,6,7]->[1,4,5,6] this is index array
+
+    // how to know which elements need to add which needs to move
+    // reversed insertion
+
+    // inside array is old relations
+    for (let i = toBePatch - 1; i >= 0; i--) {
+      // 3
+      const anchorIndex = s2 + i
+      const child = c2[anchorIndex]
+      const insertAnchor = c2[anchorIndex + 1]?.el
+      if (newIndexToOldIndexMap[i] === 0) {
+        // virtual dom has been created
+        patch(null, child, el, insertAnchor)
+      } else {
+        // raw reversed insertion - longest increasing subsequence
+        hostInsert(child.el, el, insertAnchor)
+      }
+      console.log(child)
+    }
+
+    console.log(keyToNewIndexMap)
 
     // i = 0; e1 = 8; e2 = 7
     // a b c d e h q f g
