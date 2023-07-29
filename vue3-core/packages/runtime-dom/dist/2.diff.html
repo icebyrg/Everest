@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+      // import { createRender, h, render } from './runtime-dom.js'
+      // import './runtime-dom.js'
+
+      // const VDom = h('div', 'hello vue')
+      // const renderer = createRenderer({
+      //   insert(element, container) {
+      //     container.appendChild(element)
+      //   },
+      //   createElement(element) {
+      //     return document.createElement()
+      //   },
+      //   setElementText(element, text) {
+      //     element.innerHTML = text
+      //   },
+      // })
+      // render(VDom, app)
+
+      import { h, render } from './runtime-dom.js'
+      // const VDom = h('div', h('span'))
+      // const VDom = h('div', { style: { color: 'red' } })
+      // const VDom = h('div', [h('span'), h('span')])
+      // const VDom = h('div', h('span'), h('span')) // 错误写法 会被认为第2个参数是属性
+      // const VDom = h('div', {}, [h('span'), h('span')])
+      // const VDom = h('div', {}, h('span'), h('span'))
+
+      const VDom1 = h('div', [h('div', { key: 'd' }, 'd'), h('div', { key: 'e' }, 'e'), h('div', { key: 'a' }, 'a'), h('div', { key: 'a' }, 'b'), h('div', { key: 'c' }, 'c')])
+      const VDom2 = h('div', [h('div', { key: 'a' }, 'a'), h('div', { key: 'a' }, 'b'), h('div', { key: 'c' }, 'c')])
+      // render方法是非常常用的 我们在vue中想渲染一个弹框组件
+      render(VDom1, app)
+      setTimeout(() => {
+        render(VDom2, app)
+      }, 1000)
+    </script>
+  </body>
+</html>

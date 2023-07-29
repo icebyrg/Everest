@@ -1,13 +1,13 @@
 export const nodeOps = {
   insert(el, parent, anchor) {
     // <div id="app"><span></span></div>
-    // 具备插入到某个元素前面 如果不传递anchor则是直接appendChild元素
+    // 插入到某个元素前面 如果不传递anchor则是直接appendChild元素
     return parent.insertBefore(el, anchor || null)
   },
   remove(el) {
     const parent = el.parentNode
     if (parent) {
-      parent.removeChild(el)
+      return parent.removeChild(el)
     }
   },
   createElement(type) {
