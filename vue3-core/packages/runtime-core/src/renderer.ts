@@ -1,5 +1,54 @@
-import { ShapeFlags } from '@vue/shared'
-import { isSameVnode } from './createVNode'
+import { ShapeFlags, isNumber, isString } from '@vue/shared'
+import { Fragment, Text, convert, createVNode, isSameVnode } from './createVNode'
+
+function getSeq(arr) {
+  const result = [0]
+  const len = arr.length // 总长度
+  let resultLastIndex
+  let start
+  let end
+  let middle = 0
+  let p = arr.slice(0)
+  for (let i = 0; i < len; i++) {
+    const arrI = arr[i]
+    if (arrI != 0) {
+      // get last item in sequence
+      resultLastIndex = result[result.length - 1]
+      if (arr[resultLastIndex] < arrI) {
+        result.push(i)
+        p[i] = resultLastIndex // 记录它的前一个值的索引
+        continue
+      }
+      // ... 替换
+      start = 0
+      end = result.length - 1
+      while (start < end) {
+        // start to end
+        middle = ((start + end) / 2) | 0
+        // 结果集中间的那一项的值
+        // 1 2 3 4 6  -1
+        if (arr[result[middle]] < arrI) {
+          start = middle + 1
+        } else {
+          end = middle
+        }
+      }
+      // start === end
+      if (arrI < arr[result[end]]) {
+        p[i] = result[end - 1]
+        // [1,2,3]
+        result[end] = i // 发现最后找到的索引比这一项大 那就用这个索引换掉 因为更有潜力
+      }
+    }
+  }
+  let i = result.length
+  let last = result[i - 1] // 拿到 9(末尾项) 的索引向上找
+  while (i-- > 0) {
+    result[i] = last
+    last = p[last] // 追溯上一次的值
+  }
+  return result
+}
 
 export function createRenderer(options) {
   let {
@@ -17,7 +66,8 @@ export function createRenderer(options) {
   const mountChildren = (children, container) => {
     for (let i = 0; i < children.length; i++) {
       // 递归调用patch方法 创建元素
-      patch(null, children[i], container)
+      const child = convert(children[i])
+      patch(null, child, container)
     }
   }
   const unmountChildren = (children) => {
@@ -186,7 +236,10 @@ export function createRenderer(options) {
         patch(child, c2[newIndex], el) // only compared for attributes, also need to move position
       }
     }
-    console.log(newIndexToOldIndexMap) // which elements doesn`t need moving
+
+    const increasingIndexMap = getSeq(newIndexToOldIndexMap)
+    let lastIndex = increasingIndexMap.length - 1
+
     // [5,3,4,0]->[1,2] find out fixed elements based on marker, match index in reversed iteration and skip it
     // [5,3,8,0,4,6,7]->[1,4,5,6] this is index array
 
@@ -195,22 +248,29 @@ export function createRenderer(options) {
 
     // inside array is old relations
     for (let i = toBePatch - 1; i >= 0; i--) {
+      // [3,2,1,0] = h d c e
       // 3
       const anchorIndex = s2 + i
       const child = c2[anchorIndex]
       const insertAnchor = c2[anchorIndex + 1]?.el
+      // vue2 will have unnecessary extra movements, vue3 will not
       if (newIndexToOldIndexMap[i] === 0) {
         // virtual dom has been created
         patch(null, child, el, insertAnchor)
       } else {
         // raw reversed insertion - longest increasing subsequence
-        hostInsert(child.el, el, insertAnchor)
+        if (increasingIndexMap[lastIndex] === i) {
+          lastIndex--
+        } else {
+          hostInsert(child.el, el, insertAnchor)
+        }
       }
-      console.log(child)
     }
 
     console.log(keyToNewIndexMap)
 
+    // follow up we can use template compilor to mark dynamic nodes, when creating virtual dom we can collect dynamic nodes for comparison
+    // in vue if using jsx, block tree(dynamic collection) can not be done
     // i = 0; e1 = 8; e2 = 7
     // a b c d e h q f g
     // a b c m n q f g
@@ -233,6 +293,31 @@ export function createRenderer(options) {
     patchProps(n1.props || {}, n2.props, el)
     patchChildren(n1, n2, el)
   }
+  function processElement(n1, n2, container, anchor) {
+    if (n1 == null) {
+      // 初始化逻辑
+      mountElement(n2, container, anchor)
+    } else {
+      patchElement(n1, n2, container)
+    }
+  }
+  function processText(n1, n2, container) {
+    if (n1 == null) {
+      hostInsert((n2.el = hostCreateText(n2.children)), container)
+    } else {
+      let el = (n2.el = n1.el)
+      if (n2.children != n1.children) {
+        hostSetText(el, n2.children)
+      }
+    }
+  }
+  function processFragment(n1, n2, container) {
+    if (n1 == null) {
+      mountChildren(n2.children, container)
+    } else {
+      patchChildren(n1, n2, container)
+    }
+  }
   // patch方法每次更新都会重新执行
   const patch = (n1, n2, container, anchor = null) => {
     // n1和n2是不是相同的节点 如果不是相同节点 直接删掉换新的
@@ -241,11 +326,17 @@ export function createRenderer(options) {
       unmount(n1)
       n1 = null // 删除之前的 继续走初始化流程
     }
-    if (n1 == null) {
-      // 初始化逻辑
-      mountElement(n2, container, anchor)
-    } else {
-      patchElement(n1, n2, container)
+    const { type } = n2
+    switch (type) {
+      case Text:
+        processText(n1, n2, container)
+        break
+      case Fragment:
+        processFragment(n1, n2, container)
+        break
+      default:
+        processElement(n1, n2, container, anchor)
+        break
     }
   }
   // 此方法并不关心options是谁提供的

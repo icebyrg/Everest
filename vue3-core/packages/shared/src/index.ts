@@ -7,6 +7,9 @@ export function isFunction(val) {
 export function isString(val) {
   return typeof val === 'string'
 }
+export function isNumber(val) {
+  return typeof val === 'number'
+}
 
 // 用位运算针对特定的值可以组合
 export const enum ShapeFlags {

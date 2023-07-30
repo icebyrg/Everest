@@ -27,6 +27,7 @@ function getSeq(arr) {
   let start
   let end
   let middle = 0
+  let p = arr.slice(0)
   for (let i = 0; i < len; i++) {
     const arrI = arr[i]
     if (arrI != 0) {
@@ -34,6 +35,7 @@ function getSeq(arr) {
       resultLastIndex = result[result.length - 1]
       if (arr[resultLastIndex] < arrI) {
         result.push(i)
+        p[i] = resultLastIndex // 记录它的前一个值的索引
         continue
       }
       // ... 替换
@@ -52,13 +54,21 @@ function getSeq(arr) {
       }
       // start === end
       if (arrI < arr[result[end]]) {
+        p[i] = result[end - 1]
+        // [1,2,3]
         result[end] = i // 发现最后找到的索引比这一项大 那就用这个索引换掉 因为更有潜力
       }
     }
   }
+  let i = result.length
+  let last = result[i - 1] // 拿到 9(末尾项) 的索引向上找
+  while (i-- > 0) {
+    result[i] = last
+    last = p[last] // 追溯上一次的值
+  }
   return result
 }
 
-console.log(getSeq([2, 5, 8, 9, 7, 4, 6, 11]))
+console.log(getSeq([2, 3, 1, 5, 6, 8, 7, 9, 4]))
 
 // 2 4 6 9 11 -> [0,5,6,3,7]
