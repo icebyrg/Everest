@@ -11,9 +11,10 @@ function cleanupEffect(effect) {
 }
 
 export class ReactiveEffect {
-  // 默认会将fn挂载到类的实例上
-  constructor(private fn) {}
   parent = undefined
+  active = true
+  // 默认会将fn挂载到类的实例上
+  constructor(public fn, public scheduler?) {}
   deps = [] // 我依赖了哪些列表
   run() {
     try {

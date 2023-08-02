@@ -1,5 +1,8 @@
 import { ShapeFlags, isNumber, isString } from '@vue/shared'
 import { Fragment, Text, convert, createVNode, isSameVnode } from './createVNode'
+import { ReactiveEffect, reactive } from '@vue/reactivity'
+import { queueJob } from './scheduler'
+import { createInstance, setupComponent } from './component'
 
 function getSeq(arr) {
   const result = [0]
@@ -318,6 +321,43 @@ export function createRenderer(options) {
       patchChildren(n1, n2, container)
     }
   }
+  function setupRenderEffect(instance, container) {
+    const componentUpdateFn = () => {
+      if (!instance.isMounted) {
+        // initial render
+        const subTree = instance.render.call(instance.proxy, instance.proxy)
+        instance.subTree = subTree
+        patch(null, subTree, container)
+        instance.isMounted = true
+      } else {
+        // component update, self state updated then update subTree
+        const subTree = instance.render.call(instance.proxy, instance.proxy)
+        patch(instance.subTree, subTree, container)
+        instance.subTree = subTree
+      }
+    }
+    const effect = new ReactiveEffect(
+      componentUpdateFn,
+      () => queueJob(instance.update) // update logic
+    )
+    const update = (instance.update = effect.run.bind(effect))
+    update()
+  }
+  function mountComponent(n2, container) {
+    // 1) initiate a component instance
+    const instance = (n2.component = createInstance(n2))
+    // 2) initiate instance attributes (props, attrs, slots)
+    setupComponent(instance)
+    // 3) initiate render effect
+    setupRenderEffect(instance, container)
+  }
+  function processComponent(n1, n2, container) {
+    if (n1 == null) {
+      mountComponent(n2, container)
+    } else {
+      // patchComponent() component attributes updated or slot updated
+    }
+  }
   // patch方法每次更新都会重新执行
   const patch = (n1, n2, container, anchor = null) => {
     // n1和n2是不是相同的节点 如果不是相同节点 直接删掉换新的
@@ -326,7 +366,7 @@ export function createRenderer(options) {
       unmount(n1)
       n1 = null // 删除之前的 继续走初始化流程
     }
-    const { type } = n2
+    const { type, shapeFlag } = n2
     switch (type) {
       case Text:
         processText(n1, n2, container)
@@ -335,7 +375,12 @@ export function createRenderer(options) {
         processFragment(n1, n2, container)
         break
       default:
-        processElement(n1, n2, container, anchor)
+        if (shapeFlag & ShapeFlags.ELEMENT) {
+          processElement(n1, n2, container, anchor)
+        } else if (shapeFlag & ShapeFlags.COMPONENT) {
+          // component could be stateful or functional
+          processComponent(n1, n2, container)
+        }
         break
     }
   }

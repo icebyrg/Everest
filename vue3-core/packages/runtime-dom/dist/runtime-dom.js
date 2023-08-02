@@ -123,7 +123,7 @@ function isSameVnode(n1, n2) {
   return n1.type === n2.type && n1.key === n2.key;
 }
 function createVNode(type, props, children = null) {
-  const shapeFlag = isString(type) ? 1 /* ELEMENT */ : 0;
+  const shapeFlag = isString(type) ? 1 /* ELEMENT */ : isObject(type) ? 4 /* STATEFUL_COMPONENT */ : 0;
   const vnode = {
     shapeFlag,
     __v_isVNode: true,
@@ -146,6 +146,208 @@ function createVNode(type, props, children = null) {
     vnode.shapeFlag |= type2;
   }
   return vnode;
+}
+
+// packages/reactivity/src/effect.ts
+var activeEffect = void 0;
+function cleanupEffect(effect) {
+  const { deps } = effect;
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect);
+  }
+  effect.deps.length = 0;
+}
+var ReactiveEffect = class {
+  // 默认会将fn挂载到类的实例上
+  constructor(fn, scheduler) {
+    this.fn = fn;
+    this.scheduler = scheduler;
+    this.parent = void 0;
+    this.active = true;
+    this.deps = [];
+  }
+  // 我依赖了哪些列表
+  run() {
+    try {
+      this.parent = activeEffect;
+      activeEffect = this;
+      cleanupEffect(this);
+      return this.fn();
+    } finally {
+      activeEffect = this.parent;
+      this.parent = void 0;
+    }
+  }
+};
+var targetMap = /* @__PURE__ */ new WeakMap();
+function track(target, key) {
+  if (activeEffect) {
+    let depsMap = targetMap.get(target);
+    if (!depsMap) {
+      targetMap.set(target, depsMap = /* @__PURE__ */ new Map());
+    }
+    let dep = depsMap.get(key);
+    if (!dep) {
+      depsMap.set(key, dep = /* @__PURE__ */ new Set());
+    }
+    let shouldTrack = !dep.has(activeEffect);
+    if (shouldTrack) {
+      dep.add(activeEffect);
+      activeEffect.deps.push(dep);
+    }
+  }
+}
+function trigger(target, key, newValue, oldValue) {
+  const depsMap = targetMap.get(target);
+  if (!depsMap) {
+    return;
+  }
+  const dep = depsMap.get(key);
+  const effects = [...dep];
+  effects && effects.forEach((effect) => {
+    if (effect !== activeEffect)
+      effect.run();
+  });
+}
+
+// packages/reactivity/src/handler.ts
+var mutableHandlers = {
+  // 这里的reveiver就是proxy
+  get(target, key, receiver) {
+    if (key === "__v_isReactive" /* IS_REACTIVE */) {
+      return true;
+    }
+    const res = Reflect.get(target, key, receiver);
+    track(target, key);
+    return res;
+  },
+  set(target, key, value, receiver) {
+    let oldValue = target[key];
+    const r = Reflect.set(target, key, value, receiver);
+    if (oldValue !== value) {
+      trigger(target, key, value, oldValue);
+    }
+    return r;
+  }
+};
+
+// packages/reactivity/src/reactive.ts
+var reactiveMap = /* @__PURE__ */ new WeakMap();
+function reactive(target) {
+  if (!isObject(target))
+    return target;
+  let existsProxy = reactiveMap.get(target);
+  if (existsProxy)
+    return existsProxy;
+  if (target["__v_isReactive" /* IS_REACTIVE */]) {
+    return target;
+  }
+  const proxy = new Proxy(target, mutableHandlers);
+  reactiveMap.set(target, proxy);
+  return proxy;
+}
+
+// packages/runtime-core/src/scheduler.ts
+var queue = [];
+var isFlushing = false;
+var resolvePromise = Promise.resolve();
+function queueJob(job) {
+  if (!queue.includes(job)) {
+    queue.push(job);
+  }
+  if (!isFlushing) {
+    isFlushing = true;
+    resolvePromise.then(() => {
+      isFlushing = false;
+      let arr = queue.slice(0);
+      queue.length = 0;
+      for (let i = 0; i < arr.length; i++) {
+        const job2 = arr[i];
+        job2();
+      }
+      arr.length = 0;
+    });
+  }
+}
+
+// packages/runtime-core/src/componentProps.ts
+function initProps(instance, rawProps) {
+  const props = {};
+  const attrs = {};
+  const options = instance.propsOptions || {};
+  if (rawProps) {
+    for (let key in rawProps) {
+      if (key in options) {
+        props[key] = rawProps[key];
+      } else {
+        attrs[key] = rawProps[key];
+      }
+    }
+  }
+  instance.props = reactive(props);
+  instance.attrs = attrs;
+}
+
+// packages/runtime-core/src/component.ts
+function createInstance(n2) {
+  const instance = {
+    // component instance, use it to record component attributes
+    state: null,
+    isMounted: false,
+    // whether mounted successfully
+    vnode: n2,
+    // component`s virtual node
+    subTree: null,
+    // component rendered virtual node
+    update: null,
+    // component update function
+    propsOptions: n2.type.props,
+    // user passed props
+    props: {},
+    attrs: {},
+    render: null,
+    proxy: null
+    // like proxyRefs xxx.value -> state.xxx
+  };
+  return instance;
+}
+function setupComponent(instance) {
+  let { type } = instance.vnode;
+  const publicProperties = {
+    $attrs: (instance2) => instance2.attrs,
+    $props: (instance2) => instance2.props
+  };
+  instance.proxy = new Proxy(instance, {
+    get(target, key) {
+      const { state, props } = target;
+      if (key in state) {
+        return state[key];
+      } else if (key in props) {
+        return props[key];
+      }
+      const getter = publicProperties[key];
+      if (getter) {
+        return getter(instance);
+      }
+    },
+    set(target, key, value) {
+      const { state, props } = target;
+      if (key in state) {
+        state[key] = value;
+        return true;
+      } else if (key in props) {
+        console.warn(`mutate prop ${key} not allowed, props are readonly.`);
+        return false;
+      }
+      return true;
+    }
+  });
+  initProps(instance, instance.props);
+  const data = type.data;
+  if (data) {
+    instance.state = reactive(type.data);
+  }
+  instance.render = type.render;
 }
 
 // packages/runtime-core/src/renderer.ts
@@ -377,12 +579,44 @@ function createRenderer(options) {
       patchChildren(n1, n2, container);
     }
   }
+  function setupRenderEffect(instance, container) {
+    const componentUpdateFn = () => {
+      if (!instance.isMounted) {
+        const subTree = instance.render.call(instance.proxy, instance.proxy);
+        instance.subTree = subTree;
+        patch(null, subTree, container);
+        instance.isMounted = true;
+      } else {
+        const subTree = instance.render.call(instance.proxy, instance.proxy);
+        patch(instance.subTree, subTree, container);
+        instance.subTree = subTree;
+      }
+    };
+    const effect = new ReactiveEffect(
+      componentUpdateFn,
+      () => queueJob(instance.update)
+      // update logic
+    );
+    const update = instance.update = effect.run.bind(effect);
+    update();
+  }
+  function mountComponent(n2, container) {
+    const instance = n2.component = createInstance(n2);
+    setupComponent(instance);
+    setupRenderEffect(instance, container);
+  }
+  function processComponent(n1, n2, container) {
+    if (n1 == null) {
+      mountComponent(n2, container);
+    } else {
+    }
+  }
   const patch = (n1, n2, container, anchor = null) => {
     if (n1 && !isSameVnode(n1, n2)) {
       unmount(n1);
       n1 = null;
     }
-    const { type } = n2;
+    const { type, shapeFlag } = n2;
     switch (type) {
       case Text:
         processText(n1, n2, container);
@@ -391,7 +625,11 @@ function createRenderer(options) {
         processFragment(n1, n2, container);
         break;
       default:
-        processElement(n1, n2, container, anchor);
+        if (shapeFlag & 1 /* ELEMENT */) {
+          processElement(n1, n2, container, anchor);
+        } else if (shapeFlag & 6 /* COMPONENT */) {
+          processComponent(n1, n2, container);
+        }
         break;
     }
   };

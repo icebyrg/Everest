@@ -1,5 +1,5 @@
 // 类型 属性 孩子
-import { ShapeFlags, isNumber, isString } from '@vue/shared'
+import { ShapeFlags, isNumber, isObject, isString } from '@vue/shared'
 
 export const Text = Symbol('Text')
 export const Fragment = Symbol('Fragment')
@@ -21,8 +21,12 @@ export function isSameVnode(n1, n2) {
   return n1.type === n2.type && n1.key === n2.key
 }
 export function createVNode(type, props, children = null) {
-  // React.createElement
-  const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0
+  // like React.createElement
+  const shapeFlag = isString(type)
+    ? ShapeFlags.ELEMENT // 这个是元素
+    : isObject(type)
+    ? ShapeFlags.STATEFUL_COMPONENT // 这个是组件
+    : 0
   const vnode = {
     shapeFlag,
     __v_isVNode: true,
