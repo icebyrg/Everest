@@ -7,3 +7,4 @@ class Animal {
 }
 
 Reflect.defineMetadata('Class', 'Class metadata', Animal)
+asdasdasd
