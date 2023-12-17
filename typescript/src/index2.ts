@@ -5,6 +5,3 @@ class Animal {
   eat() {}
   drink() {}
 }
-
-Reflect.defineMetadata('Class', 'Class metadata', Animal)
-asdasdasd
