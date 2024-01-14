@@ -2,37 +2,34 @@
 // 1）一个函数返回一个函数 那么这个函数就是高阶函数
 // 2）一个函数的参数是一个函数 那么这个函数也可以称之为高阶函数
 
-function a() {
-  return function () {}
+// 高阶函数 是函数式编程的核心概念
+// 1）extend fn logic without compromise original fn
+function coreFunction(a, b, c) {
+  console.log(a, b, c)
 }
 
-function a(callback) {}
-a(function () {})
-
-function a(fn) {
-  return function () {
-    fn() // 两者都满足也是高阶函数
-  }
-}
-
-function core(a, b, c) {
-  // 我们希望对这个core进行封装
-  console.log('核心逻辑', a, b, c)
-}
-
-// 切片编程
-Function.prototype.before = function (fn) {
-  // this 向上查找
+Function.prototype.before = function (callback) {
   return (...args) => {
-    // 箭头函数中是没有this的 没有原型 箭头函数没有arguments
-    fn() // 做的其他逻辑
-    this(...args) // AOP 切片增加额外的逻辑 在原有的逻辑中增添额外的逻辑
-    // todo...
+    // no this arguments prototype
+    callback() // extend fn
+    this(...args) // core fn
   }
 }
 
-const newCore = core.before(() => {
-  console.log('我增添的额外逻辑')
+const enhanceCoreFunction = coreFunction.before(function () {
+  console.log('before')
 })
 
-newCore(1, 2, 3)
+enhanceCoreFunction(1, 2, 3)
+
+// 2) preset paramters
+function sum(a, b, c) {
+  return a + b + c
+}
+function apply(fn, ...presetArgs) {
+  return function (...args) {
+    return fn(...presetArgs, ...args)
+  }
+}
+let add12 = apply(sum, 1, 2)
+console.log(add12(3))

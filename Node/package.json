@@ -1,7 +1,8 @@
 {
-  "name": "node",
+  "name": "learn-node",
   "version": "1.0.0",
-  "description": "- 1）一个函数返回一个函数 那么这个函数就是高阶函数 - 2）一个函数的参数是一个函数 那么这个函数也可以称之为高阶函数",
+  "type": "module",
+  "description": "Learn Node",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
