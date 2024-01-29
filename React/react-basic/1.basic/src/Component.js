@@ -1,13 +1,14 @@
-import { findDOM, compareTwoVdom } from './react-dom/client'
+import { compareTwoVdom, findDOM } from './react-dom/client'
+
 // an update queue
-export let updateQueue = {
+export const updateQueue = {
   isBatchingUpdate: false, // flag for whether updated, default in no batch and sync
   updaters: new Set(), // update set
   batchUpdate() {
     updateQueue.isBatchingUpdate = false
-    for (const updater of updateQueue.updaters) {
+    for (const updater of updateQueue.updaters)
       updater.updateComponent()
-    }
+
     updateQueue.updaters.clear()
   },
 }
@@ -19,44 +20,49 @@ class Updater {
     this.pendingState = []
     this.callbacks = []
   }
+
   flushCallbacks() {
     if (this.callbacks.length > 0) {
-      this.callbacks.forEach((callback) => callback())
+      this.callbacks.forEach(callback => callback())
       this.callbacks.length = 0
     }
   }
+
   addState(partialState, callback) {
     this.pendingState.push(partialState)
     if (typeof callback === 'function')
       // ready to update
       this.emitUpdate()
   }
+
   emitUpdate() {
     // if need batch update
     if (updateQueue.isBatchingUpdate) {
       // no direct update component, save updater to queue
       updateQueue.updaters.add(this)
-    } else {
+    }
+    else {
       this.updateComponent()
     }
     this.updateComponent()
   }
+
   updateComponent() {
     // get pending state array and class instance
     const { pendingState, classInstance } = this
     // if has state waiting for update
-    if (pendingState.length > 0) {
+    if (pendingState.length > 0)
       shouldUpdate(classInstance, this.getState())
-    }
   }
+
   // calculate new state based on pending state array
   getState() {
     const { pendingState, classInstance } = this
     let { state } = classInstance
     pendingState.forEach((partialState) => {
-      if (typeof partialState === 'function') {
+      if (typeof partialState === 'function')
         partialState = partialState()
-      }
+
       state = { ...state, ...partialState }
     })
     pendingState.length = 0
@@ -78,15 +84,17 @@ export class Component {
     // each class has an updater
     this.updater = new Updater(this)
   }
+
   setState(partialState, callback) {
     this.updater.addState(partialState, callback)
   }
+
   forceUpdate() {
     // get old dom then calc new virtual dom, diff them then update to real dom
     // get old virtual dom first: div#counter
-    let oldRenderVdom = this.oldRenderVdom
+    const oldRenderVdom = this.oldRenderVdom
     // cal new virtual dom based on new state
-    let newRenderVdom = this.render()
+    const newRenderVdom = this.render()
     // get old real dom(div)
     const oldDOM = findDOM(oldRenderVdom)
     // dom diff

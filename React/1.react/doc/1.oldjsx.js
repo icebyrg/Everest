@@ -1,6 +1,7 @@
 // 在React17以前，babel转换是老的写法
 const babel = require('@babel/core')
-let sourceCode = `<h1>
+
+const sourceCode = `<h1>
 hello<span style={{ color: 'red' }}>world</span>
 </h1>`
 
@@ -21,6 +22,6 @@ React.createElement(
         color: 'red',
       },
     },
-    'world'
-  )
+    'world',
+  ),
 )

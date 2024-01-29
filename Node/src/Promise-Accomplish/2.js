@@ -6,6 +6,7 @@
 // 5. promise一旦状态变化后不能再次改变
 // 6. 如果new Promise的时候，executor函数中抛出异常，会走失败态
 const Promise = require('./promise')
+
 const promise = new Promise((resolve, reject) => {
   throw new Error('失败')
   setTimeout(() => {
@@ -18,5 +19,5 @@ promise.then(
   },
   (reason) => {
     console.log('失败')
-  }
+  },
 )

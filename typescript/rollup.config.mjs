@@ -1,8 +1,8 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import ts from 'rollup-plugin-typescript2'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import serve from 'rollup-plugin-serve'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 export default {
   input: './src/index.ts',

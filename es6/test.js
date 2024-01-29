@@ -1,7 +1,6 @@
 function _classCallCheck(instance, constructor) {
-  if (!(instance instanceof constructor)) {
+  if (!(instance instanceof constructor))
     throw new Error()
-  }
 }
 
 function defineProperties(target, arr) {}
@@ -11,9 +10,9 @@ function _createClass(constructor, protoProperties, staticProperties) {
   }
 }
 
-let Parent = function () {
+const Parent = function () {
   function P() {}
   return P
 }
 
-let a = new Parent()
+const a = new Parent()

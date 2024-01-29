@@ -15,7 +15,7 @@ class Promise {
         this.value = value
         this.status = FULFILLED
         // publisher
-        this.onResolvedCallbacks.forEach((fn) => fn())
+        this.onResolvedCallbacks.forEach(fn => fn())
       }
     }
     // transition promise into failure
@@ -23,22 +23,24 @@ class Promise {
       if (this.status === PENDING) {
         this.reason = reason
         this.status = REJECTED
-        this.onRejectedCallbacks.forEach((fn) => fn())
+        this.onRejectedCallbacks.forEach(fn => fn())
       }
     }
     try {
       executor(resolve, reject)
-    } catch (e) {
+    }
+    catch (e) {
       reject(e)
     }
   }
+
   then(onFulfilled, onRejected) {
-    if (this.status === FULFILLED) {
+    if (this.status === FULFILLED)
       onFulfilled(this.value)
-    }
-    if (this.status === REJECTED) {
+
+    if (this.status === REJECTED)
       onRejected(this.reason)
-    }
+
     if (this.status === PENDING) {
       // subscriber
       this.onResolvedCallbacks.push(() => {

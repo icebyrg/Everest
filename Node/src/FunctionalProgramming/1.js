@@ -40,12 +40,12 @@ function fn2() {
 // 高阶函数 参数是函数的情况 函数式编程就是对运算过程的抽象
 Array.prototype.reduce = function (callback, startVal) {
   // 如果传递了开始的值 内部会从第一项开始遍历 如果没传 会从头开始循环 0,1
-  let arr = this
+  const arr = this
   let acc = typeof startVal === 'undefined' ? arr[0] : startVal
-  let sIndex = typeof startVal === 'undefined' ? 1 : 0
-  for (let i = sIndex; i < arr.length; i++) {
+  const sIndex = typeof startVal === 'undefined' ? 1 : 0
+  for (let i = sIndex; i < arr.length; i++)
     acc = callback(acc, arr[i])
-  }
+
   return acc
 }
 
@@ -62,7 +62,7 @@ Function.prototype.before = function (callback) {
     this() // say
   }
 }
-let newSay = say.before(() => {
+const newSay = say.before(() => {
   // before 高阶函数
   console.log('before say')
 })
@@ -77,8 +77,9 @@ function exec(a, b) {
   return a + b
 }
 
-const _ = require('lodash') // 加载第三方模块
-const resolver = (...args) => {
+const _ = require('lodash')
+// 加载第三方模块
+function resolver(...args) {
   return JSON.stringify(args)
 }
 
@@ -95,11 +96,11 @@ function memoize(fn, resolver) {
   }
 }
 
-let memoizedExec = _.memoize(exec, resolver) // resolver需要返回一个缓存的key
+const memoizedExec = _.memoize(exec, resolver) // resolver需要返回一个缓存的key
 console.log(memoizedExec(1, 2))
 console.log(memoizedExec(1, 2))
 
-let newFn = _.after(2, function () {
+const newFn = _.after(2, () => {
   // promise all
   console.log('runner fn')
 })
@@ -110,13 +111,13 @@ newFn()
 // 闭包：真正的开发中 我们理解的闭包：词法作用域
 function a() {
   // 当前定义的函数 记住了所在的词法作用域 b函数不在当前词法作用域中执行 此时就会产生闭包
-  let c = 100 // 只要记住了这个词法作用域 就是闭包
+  const c = 100 // 只要记住了这个词法作用域 就是闭包
   return function b() {
     console.log(c)
   }
 }
 
-let b = a()
+const b = a()
 b()
 // 记住变量 after、memoize可以缓存 函数作为参数和返回值是函数的情况 我们可以进行缓存
 

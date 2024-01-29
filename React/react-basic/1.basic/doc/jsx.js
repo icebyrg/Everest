@@ -1,4 +1,5 @@
 import { JSX } from 'react/jsx-runtime'
+
 JSX('h1', {
   className: 'title',
   style: {
@@ -15,5 +16,5 @@ React.createElement(
       color: 'red',
     },
   },
-  'hello'
+  'hello',
 )

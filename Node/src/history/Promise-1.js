@@ -15,30 +15,32 @@ class Promise {
       if (this.status === PENDING) {
         this.value = value
         this.status = FULFILLED
-        this.onResolveCallbacks.forEach((fn) => fn())
+        this.onResolveCallbacks.forEach(fn => fn())
       }
     }
     const reject = (reason) => {
       if (this.status === PENDING) {
         this.reason = reason
         this.status = REJECTED
-        this.onRejectedCallbacks.forEach((fn) => fn())
+        this.onRejectedCallbacks.forEach(fn => fn())
       }
     }
     try {
       // 如果executor执行发生异常 就默认等价于reject
       executor(resolve, reject)
-    } catch (e) {
+    }
+    catch (e) {
       reject(e)
     }
   }
+
   then(onFulfilled, onRejected) {
-    if (this.status === FULFILLED) {
+    if (this.status === FULFILLED)
       onFulfilled(this.value)
-    }
-    if (this.status === REJECTED) {
+
+    if (this.status === REJECTED)
       onRejected(this.reason)
-    }
+
     if (this.status === PENDING) {
       // 调用then的时候promise没成功也没失败
       this.onResolveCallbacks.push(() => {

@@ -1,5 +1,6 @@
 import { REACT_ELEMENT } from './constant'
 import { wrapToVdom } from './utils'
+
 /**
  * 根据参数 返回一个React元素
  * @param {*} type 元素的类型 div span p
@@ -17,11 +18,12 @@ function createElement(type, config, children) {
     key = config.key // key是用来标记一个父亲的儿子的唯一性的
     delete config.key
   }
-  let props = { ...config }
+  const props = { ...config }
   // 如果参数数量大于3 说明有儿子 并且儿子数量大于一个
   if (arguments.length > 3) {
     props.children = Array.prototype.slice.call(arguments, 2).map(wrapToVdom)
-  } else if (arguments.length === 3) {
+  }
+  else if (arguments.length === 3) {
     // 如果等于3 那就是只有一个儿子
     props.children = wrapToVdom(children)
   }

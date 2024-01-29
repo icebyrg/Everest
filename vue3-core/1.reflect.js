@@ -1,14 +1,14 @@
-let person = {
+const person = {
   name: 'jw',
   get aliasName() {
-    return '**' + this.name + '**' // this -> person
+    return `**${this.name}**` // this -> person
   },
   set aliasName(value) {
     this.name = value
   },
 }
 
-let proxyPerson = new Proxy(person, {
+const proxyPerson = new Proxy(person, {
   // person, 'aliasName', proxyPerson
   get(target, key, receiver) {
     console.log('取值', key)

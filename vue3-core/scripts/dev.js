@@ -1,6 +1,6 @@
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import minimist from 'minimist'
-import { fileURLToPath } from 'url'
-import { dirname, resolve } from 'path'
 import esbuild from 'esbuild'
 
 const args = minimist(process.argv.slice(2))
@@ -22,4 +22,4 @@ esbuild
     globalName: IIFENamesMap[target],
     platform: 'browser',
   })
-  .then((ctx) => ctx.watch())
+  .then(ctx => ctx.watch())

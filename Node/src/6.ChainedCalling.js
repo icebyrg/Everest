@@ -1,6 +1,6 @@
-import fs from 'fs'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -14,8 +14,9 @@ const __dirname = dirname(__filename)
 // use Promise to transtion async callback api to Promise
 function readFile(url) {
   return new Promise((resolve, reject) => {
-    fs.readFile(url, 'utf-8', function (err, data) {
-      if (err) return reject(err)
+    fs.readFile(url, 'utf-8', (err, data) => {
+      if (err)
+        return reject(err)
       resolve(data)
     })
   })

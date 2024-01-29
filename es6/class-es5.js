@@ -1,7 +1,6 @@
 function _classCallCheck(instance, constructor) {
-  if (!(instance instanceof constructor)) {
+  if (!(instance instanceof constructor))
     throw new Error('Class constructor cannot be invoked without new')
-  }
 }
 
 function defineProperties(target, arr) {
@@ -16,15 +15,14 @@ function defineProperties(target, arr) {
 }
 
 function _createClass(constructor, protoProperties, staticProperties) {
-  if (protoProperties.length > 0) {
+  if (protoProperties.length > 0)
     defineProperties(constructor.prototype, protoProperties)
-  }
-  if (staticProperties.length > 0) {
+
+  if (staticProperties.length > 0)
     defineProperties(constructor, staticProperties)
-  }
 }
 
-let Parent = (function () {
+const Parent = (function () {
   function P() {
     _classCallCheck(this, P)
     this.name = 'Parent'
@@ -34,13 +32,13 @@ let Parent = (function () {
     [
       {
         key: 'eat',
-        value: function () {
+        value() {
           console.log('eat')
         },
       },
       {
         key: 'drink',
-        value: function () {
+        value() {
           console.log('drink')
         },
       },
@@ -48,11 +46,11 @@ let Parent = (function () {
     [
       {
         key: 'b',
-        value: function () {
+        value() {
           return 2
         },
       },
-    ]
+    ],
   )
   return P
 })()
@@ -67,15 +65,15 @@ function _inherits(subClass, superClass) {
   Object.setPrototypeOf(subClass, superClass)
 }
 
-let Child = (function (Parent) {
+const Child = (function (Parent) {
   _inherits(C, parent)
   function C() {
     _classCallCheck(this, C)
-    let obj = Parent.call(this)
+    const obj = Parent.call(this)
     let that = this
-    if (typeof obj === 'object') {
+    if (typeof obj === 'object')
       that = obj
-    }
+
     that.age = 9
     return that
   }

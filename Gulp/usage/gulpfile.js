@@ -1,6 +1,6 @@
 const { series, parallel } = require('gulp')
 
-const defaultTask = (done) => {
+function defaultTask(done) {
   console.log('defaultTask')
   done()
 }

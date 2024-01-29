@@ -1,6 +1,6 @@
-const path = require('path')
-const fs = require('fs')
-const vm = require('vm')
+const path = require('node:path')
+const fs = require('node:fs')
+const vm = require('node:vm')
 
 function Module(id) {
   this.id = id
@@ -8,19 +8,19 @@ function Module(id) {
 }
 
 Module._extensions = {
-  '.js'(module) {
+  '.js': function (module) {
     const content = fs.readFileSync(module.id, 'utf-8')
     const fn = vm.compileFunction(content, ['exports', 'require', 'module', '__filename', '__dirname'])
     // this -> module.exports
     const exports = module.exports
-    let thisValue = exports
-    let require = req
-    let filename = module.id
-    let dirname = path.dirname(filename)
+    const thisValue = exports
+    const require = req
+    const filename = module.id
+    const dirname = path.dirname(filename)
     // 让函数执行 module.exports = 'hello'
     Reflect.apply(fn, thisValue, [exports, require, module, filename, dirname])
   },
-  '.json'(module) {
+  '.json': function (module) {
     const content = fs.readFileSync(module.id, 'utf-8')
     module.exports = JSON.parse(content)
   },
@@ -28,40 +28,39 @@ Module._extensions = {
 
 Module._resolveFilename = function (id) {
   const filename = path.resolve(__dirname, id)
-  if (fs.existsSync(filename)) {
+  if (fs.existsSync(filename))
     return filename
-  }
+
   const keys = Object.keys(Module._extensions)
   for (let i = 0; i < keys.length; i++) {
     // 尝试添加后缀
     const ext = keys[i]
     const filename = path.resolve(__dirname, id + ext)
-    if (fs.existsSync(filename)) {
+    if (fs.existsSync(filename))
       return filename
-    }
   }
   throw new Error('cannot found module')
 }
 
 Module.prototype.load = function () {
-  let ext = path.extname(this.id)
+  const ext = path.extname(this.id)
   Module._extensions[ext](this)
 }
 
 Module._cache = {}
 function req(id) {
   const filename = Module._resolveFilename(id)
-  let existsModule = Module._cache[filename]
-  if (existsModule) {
+  const existsModule = Module._cache[filename]
+  if (existsModule)
     return existsModule.exports
-  }
+
   const module = new Module(filename) // 这个对象里最重要的就是exports对象
   Module._cache[filename] = module // 加载过缓存起来
   module.load()
   return module.exports // 导出这个对象
 }
 
-let a = req('./a.json') // require拿到的是module.exports的结果 如果是引用对象 里面的内容变化了重新require是拿到最新的值
+const a = req('./a.json') // require拿到的是module.exports的结果 如果是引用对象 里面的内容变化了重新require是拿到最新的值
 
 console.log(a)
 

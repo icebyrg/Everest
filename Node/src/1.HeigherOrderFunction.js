@@ -16,7 +16,7 @@ Function.prototype.before = function (callback) {
   }
 }
 
-const enhanceCoreFunction = coreFunction.before(function () {
+const enhanceCoreFunction = coreFunction.before(() => {
   console.log('before')
 })
 
@@ -31,5 +31,5 @@ function apply(fn, ...presetArgs) {
     return fn(...presetArgs, ...args)
   }
 }
-let add12 = apply(sum, 1, 2)
+const add12 = apply(sum, 1, 2)
 console.log(add12(3))

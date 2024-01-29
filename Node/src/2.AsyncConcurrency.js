@@ -1,6 +1,6 @@
-import fs from 'fs'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -18,12 +18,11 @@ const __dirname = dirname(__filename)
 
 // 2.use HOC to multiplexing and preset paramters
 function after(times, cb) {
-  let person = {}
+  const person = {}
   return (key, value) => {
     person[key] = value
-    if (--times == 0) {
+    if (--times == 0)
       cb(person)
-    }
   }
 }
 
@@ -32,10 +31,10 @@ const cb = after(2, (person) => {
 })
 
 // node is error first
-fs.readFile(resolve(__dirname, 'age.txt'), 'utf-8', function (err, data) {
+fs.readFile(resolve(__dirname, 'age.txt'), 'utf-8', (err, data) => {
   cb('age', data)
 })
 
-fs.readFile(resolve(__dirname, 'name.txt'), 'utf-8', function (err, data) {
+fs.readFile(resolve(__dirname, 'name.txt'), 'utf-8', (err, data) => {
   cb('name', data)
 })

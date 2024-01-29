@@ -1,4 +1,5 @@
 import { updateQueue } from './Component'
+
 /**
  * add event handler function to dom element
  * @param {} dom the dom element to add event
@@ -7,7 +8,7 @@ import { updateQueue } from './Component'
  */
 export function addEvent(dom, eventType, handler) {
   // determine whether dom element has store attribute, return if it has and empty object if not
-  let store = dom.store || (dom.store = {})
+  const store = dom.store || (dom.store = {})
   // save attribute (event type like onclick) and value (event handler fn)
   // onClick onClickCapture
   store[eventType.toLowerCase()] = handler
@@ -19,14 +20,14 @@ export function addEvent(dom, eventType, handler) {
       (event) => {
         dispatchEvent(event, true)
       },
-      true
+      true,
     )
     document.addEventListener(
       eventName.slice(2).toLowerCase(),
       (event) => {
         dispatchEvent(event, false)
       },
-      false
+      false,
     )
     document[eventName] = true
   }
@@ -38,13 +39,13 @@ function dispatchEvent(event, isCapture) {
   // 2. unified event handler, implete synthetic event
   // target: event source -> button, type: event name -> click
   const { target, type } = event
-  let eventType = `on${type}` // onclick
-  let eventTypeCapture = `on${type}capture` // onclick
-  let syntheticEvent = createSyntheticEvent(event)
+  const eventType = `on${type}` // onclick
+  const eventTypeCapture = `on${type}capture` // onclick
+  const syntheticEvent = createSyntheticEvent(event)
   updateQueue.isBatchingUpdate = true
   // for implement of React source code, we need to simulate process of capture and bubbling
   // record stack
-  let targetStack = []
+  const targetStack = []
   let currentTarget = target // button
   while (currentTarget) {
     targetStack.push(currentTarget) // button div#counter div#root document
@@ -54,16 +55,17 @@ function dispatchEvent(event, isCapture) {
     // deal with capture phase
     for (let i = targetStack.length - 1; i >= 0; i--) {
       const currentTarget = targetStack[i]
-      let { store } = currentTarget
-      let handler = store && store[eventTypeCapture]
+      const { store } = currentTarget
+      const handler = store && store[eventTypeCapture]
       handler && handler(syntheticEvent)
     }
-  } else {
+  }
+  else {
     // deal with bubble phase
     for (let i = 0; i < targetStack.length; i++) {
       const currentTarget = targetStack[i]
-      let { store } = currentTarget
-      let handler = store && store[eventType]
+      const { store } = currentTarget
+      const handler = store && store[eventType]
       handler && handler(syntheticEvent)
     }
   }
@@ -80,10 +82,11 @@ function dispatchEvent(event, isCapture) {
  * @param {*} event
  */
 function createSyntheticEvent(nativeEvent) {
-  let syntheticEvent = {}
-  for (let key in nativeEvent) {
+  const syntheticEvent = {}
+  for (const key in nativeEvent) {
     let value = nativeEvent[key]
-    if (typeof value === 'function') value = value.bind(nativeEvent)
+    if (typeof value === 'function')
+      value = value.bind(nativeEvent)
     syntheticEvent[key] = value
   }
   syntheticEvent.nativeEvent = nativeEvent
@@ -101,7 +104,8 @@ function preventDefault() {
   if (nativeEvent.preventDefault) {
     // modern browser
     nativeEvent.preventDefault()
-  } else {
+  }
+  else {
     // IE
     nativeEvent.returnValue = false
   }
@@ -113,7 +117,8 @@ function stopPropagation() {
   if (nativeEvent.stopPropagation) {
     // modern browser
     nativeEvent.stopPropagation()
-  } else {
+  }
+  else {
     // IE
     nativeEvent.cancelBubble = true
   }

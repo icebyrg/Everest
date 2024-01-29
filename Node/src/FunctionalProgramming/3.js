@@ -1,8 +1,9 @@
 const _ = require('lodash')
+
 const str = 'click button'
-let pp1 = _.split(str, ' ')
-let pp2 = _.join(pp1, '_')
-let pp3 = _.toUpper(pp2)
+const pp1 = _.split(str, ' ')
+const pp2 = _.join(pp1, '_')
+const pp3 = _.toUpper(pp2)
 
 // 组合的要求 必须是一个参数的入参 柯里化
 // 函数式编程 是组合后 传递数据 拿到结果 str

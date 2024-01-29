@@ -2,13 +2,13 @@
   "name": "1.react",
   "version": "1.0.0",
   "description": "",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
   "main": "index.js",
   "scripts": {
     "dev": "vite"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.21.3",
     "@babel/plugin-transform-react-jsx": "^7.21.0",

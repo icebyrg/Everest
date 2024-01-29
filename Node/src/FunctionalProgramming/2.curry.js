@@ -16,7 +16,7 @@ function sum3(x) {
     return function (z) {}
   }
 }
-let sum31 = sum3(1) // 我们可以通过一个范围较大的函数 衍生出小函数 可以通过组合来使用
+const sum31 = sum3(1) // 我们可以通过一个范围较大的函数 衍生出小函数 可以通过组合来使用
 sum3(2)(3)
 
 function isType(typing, val) {
@@ -29,6 +29,7 @@ console.log(isType('String', 100))
 console.log(isType('String', true))
 
 const _ = require('lodash')
+
 const curriedIsType = _.curry(isType)
 const isString = curriedIsType('String')
 console.log(isString('hello'))
@@ -45,7 +46,7 @@ function toFixed(num) {
   return num.toFixed(2)
 }
 function addPrefix(str) {
-  return '$' + str
+  return `$${str}`
 }
 
 function flowRight(...fns) {
@@ -56,7 +57,7 @@ function flowRight(...fns) {
   return fns.reduceRight(
     (a, b) =>
       (...args) =>
-        b(a(...args))
+        b(a(...args)),
   )
 }
 

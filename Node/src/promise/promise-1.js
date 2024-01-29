@@ -23,17 +23,18 @@ class Promise {
     }
     try {
       executor(resolve, reject)
-    } catch (e) {
+    }
+    catch (e) {
       reject(e)
     }
   }
+
   then(onFulfilled, onRejected) {
-    if (this.status === FULFILLED) {
+    if (this.status === FULFILLED)
       onFulfilled(this.value)
-    }
-    if (this.status === REJECTED) {
+
+    if (this.status === REJECTED)
       onRejected(this.reason)
-    }
   }
 }
 

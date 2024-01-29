@@ -9,6 +9,7 @@
 // 7.executor是立即执行的
 
 const Promise = require('./history/Promise-1')
+
 const promise = new Promise((resolve, reject) => {
   setTimeout(() => {
     // resolve('ok')
@@ -22,7 +23,7 @@ promise.then(
   },
   (reason) => {
     console.log('失败1', reason)
-  }
+  },
 )
 promise.then(
   (value) => {
@@ -30,5 +31,5 @@ promise.then(
   },
   (reason) => {
     console.log('失败2', reason)
-  }
+  },
 )

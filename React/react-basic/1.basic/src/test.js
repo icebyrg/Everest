@@ -1,7 +1,6 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-let element = (
+const element = (
   <div className="title" style={{ color: 'red' }}>
     <span>hello</span>
   </div>

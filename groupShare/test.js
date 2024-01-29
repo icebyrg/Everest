@@ -1,7 +1,7 @@
-let person = {
+const person = {
   name: 'John',
   get aliasName() {
-    return '**' + this.name
+    return `**${this.name}`
   },
   set aliasName(value) {
     this.name = value

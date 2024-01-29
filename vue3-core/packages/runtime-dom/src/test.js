@@ -1,13 +1,13 @@
 function createInvoker(val) {
-  const invoker = (e) => invoker.val(e)
+  const invoker = e => invoker.val(e)
   invoker.val = val
   return invoker
 }
 
-const fn = (e) => {
+function fn(e) {
   console.log(1)
 }
-const fn2 = (e) => {
+function fn2(e) {
   console.log(2)
 }
 

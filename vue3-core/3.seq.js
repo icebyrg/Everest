@@ -27,7 +27,7 @@ function getSeq(arr) {
   let start
   let end
   let middle = 0
-  let p = arr.slice(0)
+  const p = arr.slice(0)
   for (let i = 0; i < len; i++) {
     const arrI = arr[i]
     if (arrI != 0) {
@@ -46,11 +46,10 @@ function getSeq(arr) {
         middle = ((start + end) / 2) | 0
         // 结果集中间的那一项的值
         // 1 2 3 4 6  -1
-        if (arr[result[middle]] < arrI) {
+        if (arr[result[middle]] < arrI)
           start = middle + 1
-        } else {
+        else
           end = middle
-        }
       }
       // start === end
       if (arrI < arr[result[end]]) {

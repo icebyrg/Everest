@@ -1,4 +1,5 @@
 const Promise = require('./promise')
+
 const promise = new Promise((resolve, reject) => {
   setTimeout(() => {
     resolve('成功') // 发布
@@ -10,7 +11,7 @@ promise.then(
   },
   (reason) => {
     console.log('失败')
-  }
+  },
 )
 promise.then(
   (value) => {
@@ -18,5 +19,5 @@ promise.then(
   },
   (reason) => {
     console.log('失败')
-  }
+  },
 )

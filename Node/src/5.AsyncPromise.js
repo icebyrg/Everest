@@ -12,19 +12,19 @@ const promise = new Promise((resolve, reject) => {
 })
 
 promise.then(
-  function (value) {
+  (value) => {
     console.log('success callback1', value)
   },
-  function (reason) {
+  (reason) => {
     console.log('fail callback1', reason)
-  }
+  },
 )
 
 promise.then(
-  function (value) {
+  (value) => {
     console.log('success callback2', value)
   },
-  function (reason) {
+  (reason) => {
     console.log('fail callback2', reason)
-  }
+  },
 )

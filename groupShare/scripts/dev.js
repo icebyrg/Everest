@@ -1,5 +1,5 @@
+const { resolve } = require('node:path')
 const { build } = require('esbuild')
-const { resolve } = require('path')
 
 const target = 'reactivity'
 

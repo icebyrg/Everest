@@ -1,7 +1,8 @@
 // Publisher-Subscriber Pattern, each times finished read we can do something
-import fs from 'fs'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -13,9 +14,10 @@ class EventEmitter {
   on(callback) {
     this.#arr.push(callback) // intermediator stores subscribed fn
   }
+
   emit(key, value) {
     this.#person[key] = value
-    this.#arr.forEach((fn) => fn(this.#person))
+    this.#arr.forEach(fn => fn(this.#person))
   }
 }
 const events = new EventEmitter()
@@ -24,16 +26,15 @@ events.on((person) => {
   console.log(person, 'read once')
 })
 events.on((person) => {
-  if (Reflect.ownKeys(person).length === 2) {
+  if (Reflect.ownKeys(person).length === 2)
     console.log(person, 'read done')
-  }
 })
 
-fs.readFile(resolve(__dirname, 'age.txt'), 'utf-8', function (err, data) {
+fs.readFile(resolve(__dirname, 'age.txt'), 'utf-8', (err, data) => {
   events.emit('age', data)
 })
 
-fs.readFile(resolve(__dirname, 'name.txt'), 'utf-8', function (err, data) {
+fs.readFile(resolve(__dirname, 'name.txt'), 'utf-8', (err, data) => {
   events.emit('name', data)
 })
 

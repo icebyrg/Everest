@@ -27,10 +27,10 @@ const promise = new Promise((resolve, reject) => {
   throw new Error('error')
 })
 promise.then(
-  function (value) {
+  (value) => {
     console.log('success callback', value)
   },
-  function (reason) {
+  (reason) => {
     console.log('fail callback', reason)
-  }
+  },
 )
