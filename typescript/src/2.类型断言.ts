@@ -1,5 +1,5 @@
 // 声明一个变量 没有给类型的时候 默认类型是any
-let name = 'jw' // 等号左边的类型 可以通过右边自动推导 此时就不用添加类型了
+let name = 'sam' // 等号左边的类型 可以通过右边自动推导 此时就不用添加类型了
 
 // const let 区别 const意味着值不能发生变化 类型范围更小 let可以改变值 会推断的范围更大
 
@@ -45,7 +45,7 @@ strOrNum1! as any as boolean // 缺点就是会破坏原有的类型 不建议�
 // 断言：我可以自己指定特定的类型
 
 // 字面量类型
-const username: 'jw' = 'jw'
+const username: 'sam' = 'sam'
 const password: 123456 = 123456
 
 // 字面量类型和联合类型 放在一起用 就更加灵活了

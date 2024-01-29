@@ -71,9 +71,9 @@ type T4 = Person
 type ConstructorParamters<T extends new (...args: any[]) => any> = T extends (...args: infer P) => any ? P : never
 type T5 = ConstructorParamters<typeof Person>
 
-// ['jw',30,'huilongguan']
+// ['sam',30,'huilongguan']
 type TailToHead<T extends any[]> = T extends [...infer C, infer B] ? [B, ...C] : any
-type x = TailToHead<['jw', 30, 40, 50, 'huilongguan']> // ['huilongguan','jw',30,40,50]
+type x = TailToHead<['sam', 30, 40, 50, 'huilongguan']> // ['huilongguan','sam',30,40,50]
 
 // 将元组转换成联合类型
 type ElementOf<T> = T extends Array<infer R> ? R : any // Array<infer R> (string|number|boolean)[]

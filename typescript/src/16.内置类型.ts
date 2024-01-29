@@ -73,9 +73,9 @@ type PickPerson = Pick<Person, 'name' | 'age'>
 
 // T extends object -> T extends Record<string, any>
 let obj: Record<string, any> = {
-  name: 'jw',
+  name: 'sam',
   age: 30,
-} // -> ['jw', 30]
+} // -> ['sam', 30]
 
 function map<K extends string, V, R>(obj: Record<K, V>, callback: (item: V, key: K) => R) {
   let result = {} as Record<K, R>
@@ -85,7 +85,7 @@ function map<K extends string, V, R>(obj: Record<K, V>, callback: (item: V, key:
   return result
 }
 
-// 1) 根据传入的值进行类型推导 name和age会赋予给K 'jw'30会赋予给V
+// 1) 根据传入的值进行类型推导 name和age会赋予给K 'sam'30会赋予给V
 // 2) 拿到callback的返回值 R 会根据你的返回值来推导 string：(string|number+string=string)
 // 3) 映射成一个新的record 这个新的record由K和R组成
 type Record<K extends keyof any, T> = { [P in K]: T } // record就是一个对象
@@ -95,7 +95,7 @@ type Record<K extends keyof any, T> = { [P in K]: T } // record就是一个对�
 
 map<'name' | 'age', string | number, string>(
   {
-    name: 'jw',
+    name: 'sam',
     age: 30,
   },
   (item, key) => {

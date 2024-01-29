@@ -29,7 +29,7 @@ getArray(3, 'abc') // ['abc','abc','abc'] 当我使用的时候可以确定类�
 // const swap: ISwap = (tuple) => {
 //   return [tuple[1], tuple[0]]
 // }
-// let swapResult = swap(['jw', true])
+// let swapResult = swap(['sam', true])
 // let r1 = swapResult[0]
 
 // 1) 使用接口的时候确定的类型

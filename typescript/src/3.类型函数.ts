@@ -36,7 +36,7 @@ let r = sum('a', 'b', 'c', 'd')
 function getName(this: Person, key: PersonKey) { // this必须放第一个参数
   return this[key]
 }
-const person = { name: 'jw' }
+const person = { name: 'sam' }
 
 type Person = typeof person
 type PersonKey = keyof Person

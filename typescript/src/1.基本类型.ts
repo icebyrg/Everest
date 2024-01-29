@@ -36,7 +36,7 @@ let arr3: (string | number)[] = [1, 2, 3, 4, 'a', 'b', 'c', 'd']
 let arr4: Array<string> = ['a', 'b', 'c'] // 采用泛型来声明数组
 
 // ts中的元组（特点就是长度固定、类型固定）
-let tuple: [string, number, boolean] = ['jw', 30, true]
+let tuple: [string, number, boolean] = ['sam', 30, true]
 let username = tuple[0] // tpye: string
 // 元组可以通过数组的方法进行新增 只能新增已经存在的类型 而且就算放进去了也拿不出来
 tuple.push('xxx')

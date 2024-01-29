@@ -1,5 +1,5 @@
 const person = {
-  name: 'jw',
+  name: 'sam',
   get aliasName() {
     return `**${this.name}**` // this -> person
   },

@@ -28,7 +28,7 @@ interface IPerson {
 }
 let animal: IAnimal
 let person: IPerson = {
-  name: 'jw',
+  name: 'sam',
   age: 8,
   address: '',
 }
