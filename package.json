@@ -2,15 +2,15 @@
   "name": "everest",
   "type": "module",
   "version": "1.0.0",
-  "description": "",
-  "author": "",
   "license": "ISC",
-  "keywords": [],
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.3",
     "eslint": "^8.56.0"
