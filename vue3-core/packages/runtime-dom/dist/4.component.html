@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { h, render, Text, Fragment } from './runtime-dom.js'
+      // import { h, render, Text, Fragment } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+      // 组件的数据 有状态 属性
+      // 组件的核心/组成：（状态 属性）（事件 生命周期 插槽 -> webComponent）
+      // 为什么要有组件：复用 方便维护 局部更新*
+      // this的缺陷：this指向不明确 this使用的时候无法推断（ts支持也不好）无法支持tree-shaking
+      // vue2 也可以这样声明组件
+      // $attrs = all Props - $props
+      const MyComponent = {
+        props: {
+          a: Number,
+          b: Number,
+        },
+        data() {
+          return { name: 'Sam', age: 22 }
+        },
+        // 模板编译最终是把模板->render返回的结果->虚拟 DOM（h方法返回的是虚拟 dom）->渲染成真实 DOM
+        render(proxy) {
+          proxy.a = 100
+          return h('div', {}, [h('span', proxy.a), h('span', proxy.$props.b), h('span', proxy.$attrs.c)])
+        },
+      }
+      // in vue2, attributes are divided into attrs(attributes in component tag), props(passed customer attributes, not in attrs)
+      render(
+        h(MyComponent, {
+          a: 1,
+          b: 2,
+          c: 1,
+        }),
+        app
+      )
+      // vue is one-way data flow, cant update attributes, when component update, if attributes changes, it can be updated
+    </script>
+  </body>
+</html>
